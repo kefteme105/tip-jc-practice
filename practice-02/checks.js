@@ -347,6 +347,117 @@ check("35. Работа с другим набором, без зависимо�
   assert.deepEqual(tasks, before);
 });
 
+
+check("Собственный 1. Добавление, переименование и выполнение новой задачи", () => {
+  let tasks = [];
+
+  let result = addTask(tasks, 50, "  Подготовить презентацию  ", "low");
+  tasks = expectTasks(result);
+
+  assert.deepEqual(tasks, [
+    {
+      id: 50,
+      title: "Подготовить презентацию",
+      completed: false,
+      priority: "low",
+    },
+  ]);
+
+  result = renameTask(tasks, 50, "Провести презентацию");
+  tasks = expectTasks(result);
+
+  result = setTaskCompleted(tasks, 50, true);
+  tasks = expectTasks(result);
+
+  assert.deepEqual(tasks, [
+    {
+      id: 50,
+      title: "Провести презентацию",
+      completed: true,
+      priority: "low",
+    },
+  ]);
+
+  assert.deepEqual(getTaskStats(tasks), {
+    total: 1,
+    completed: 1,
+    pending: 0,
+    progress: 100,
+  });
+});
+
+
+check("Собственный 2. Удаление нескольких задач с сохранением порядка", () => {
+  let tasks = [
+    { id: 30, title: "Первая", completed: false, priority: "low" },
+    { id: 11, title: "Вторая", completed: true, priority: "medium" },
+    { id: 42, title: "Третья", completed: false, priority: "high" },
+    { id: 6, title: "Четвёртая", completed: true, priority: "low" },
+  ];
+
+  let result = removeTask(tasks, 11);
+  tasks = expectTasks(result);
+
+  result = removeTask(tasks, 42);
+  tasks = expectTasks(result);
+
+  assert.deepEqual(tasks.map((task) => task.id), [30, 6]);
+
+  assert.deepEqual(getTaskTitles(tasks), [
+    "Первая",
+    "Четвёртая",
+  ]);
+
+  assert.deepEqual(getTaskStats(tasks), {
+    total: 2,
+    completed: 1,
+    pending: 1,
+    progress: 50,
+  });
+});
+
+
+check("Собственный 3. Последовательное изменение одной задачи и сохранение остальных", () => {
+  const tasks = [
+    { id: 101, title: "Изучить JavaScript", completed: false, priority: "high" },
+    { id: 202, title: "Сделать упражнение", completed: true, priority: "medium" },
+    { id: 303, title: "Проверить результат", completed: false, priority: "low" },
+  ];
+
+  const renamed = expectTasks(
+    renameTask(tasks, 202, "Проверить упражнение")
+  );
+
+  const completed = expectTasks(
+    setTaskCompleted(renamed, 202, false)
+  );
+
+  assert.deepEqual(completed[1], {
+    id: 202,
+    title: "Проверить упражнение",
+    completed: false,
+    priority: "medium",
+  });
+
+  assert.deepEqual(completed[0], tasks[0]);
+  assert.deepEqual(completed[2], tasks[2]);
+
+  assert.deepEqual(getTaskStats(completed), {
+    total: 3,
+    completed: 0,
+    pending: 3,
+    progress: 0,
+  });
+
+  // Исходный массив и его объекты не изменились.
+  assert.deepEqual(tasks, [
+    { id: 101, title: "Изучить JavaScript", completed: false, priority: "high" },
+    { id: 202, title: "Сделать упражнение", completed: true, priority: "medium" },
+    { id: 303, title: "Проверить результат", completed: false, priority: "low" },
+  ]);
+});
+
+
 // Три собственных проверки можно добавить здесь, до итогового вывода,
 // либо выполнить отдельно и описать в отчёте. Общие проверки удалять не нужно.
 // Пример формы записи (не готовая проверка задания):
