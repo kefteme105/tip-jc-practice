@@ -1,6 +1,6 @@
 "use strict";
 
-const studentName = "Степанов Артём";
+const studentName = "Хамидов Дамир Маъруфович";
 const groupName = "ЭФБО-17-25";
 const practiceNumber = 1;
 
