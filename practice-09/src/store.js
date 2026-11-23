@@ -6,6 +6,12 @@ export function createStore() {
   const tasks = seedTasks.map(task => ({ ...task }));
   const categories = seedCategories.map(category => ({ ...category }));
   return {
+    createTask(value) {
+      const id = Math.max(0, ...tasks.map(task => task.id)) + 1;
+      const task = { id, ...value, completed: false };
+      tasks.push(task);
+      return { ...task };
+    },
     listTasks: filters => selectTasks(tasks, filters),
     getTask: id => findTask(tasks, id),
     listCategories: () => categories.map(category => ({ ...category })),

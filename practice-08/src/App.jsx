@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api, apiBaseUrl } from './config.js';
 import { createInitialFilters } from './variant.js';
 import { useTaskData } from './hooks/useTaskData.js';
@@ -13,6 +13,12 @@ export default function App() {
   const [notice, setNotice] = useState('');
   const data = useTaskData({ api, filters });
   const { tasks, categories, meta } = data.snapshot;
+  const isLoading = data.status === 'loading';
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).has('debug')) {
+      console.log('isLoading:', isLoading, 'tasks.length:', tasks.length);
+    }
+  }, [isLoading, tasks.length]);
   const disabled = data.pending || data.status !== 'ready';
   async function save(value) {
     setNotice('');

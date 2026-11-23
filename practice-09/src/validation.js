@@ -1,4 +1,15 @@
 import { ApiError } from './errors.js';
+export function parseTaskDraft(draft, categories) {
+  const errors = {};
+  const title = typeof draft?.title === 'string' ? draft.title.trim() : '';
+  if (!title || title.length > 100) errors.title = 'Название должно содержать от 1 до 100 символов.';
+  const priority = draft?.priority ?? 'medium';
+  if (!['low', 'medium', 'high'].includes(priority)) errors.priority = 'Некорректный приоритет.';
+  const categoryId = draft?.categoryId ?? 1;
+  if (!Number.isSafeInteger(categoryId) || !categories.some(c => c.id === categoryId)) errors.categoryId = 'Категория не найдена.';
+  if (Object.keys(errors).length) throw new ApiError(400, 'VALIDATION_ERROR', 'Ошибка проверки данных задачи.', errors);
+  return { title, priority, categoryId };
+}
 export function parsePositiveId(raw) {
   if (typeof raw !== 'string' || !/^[1-9]\d*$/.test(raw)) return null;
   const value = Number(raw);
